@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -38,10 +37,7 @@
         body::before {
             content: "";
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: radial-gradient(circle at 50% 30%, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
             pointer-events: none;
             z-index: 0;
@@ -80,9 +76,9 @@
             background-color: var(--felt-green);
             border: 18px solid #2c1a12;
             border-radius: 30px;
-            box-shadow:
-                0 25px 60px rgba(0, 0, 0, 0.9),
-                inset 0 0 100px rgba(0, 0, 0, 0.7);
+            box-shadow: 
+                0 25px 60px rgba(0,0,0,0.9),
+                inset 0 0 100px rgba(0,0,0,0.7);
             margin-bottom: 45px;
             overflow: hidden;
             z-index: 1;
@@ -96,13 +92,10 @@
 
         .table-overlay {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none;
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, transparent 60%);
-            box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(145deg, rgba(255,255,255,0.08) 0%, transparent 60%);
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.4);
         }
 
         .controls {
@@ -123,7 +116,7 @@
             font-weight: 900;
             border-radius: 60px;
             cursor: pointer;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(212, 175, 55, 0.3);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.5), 0 0 20px rgba(212, 175, 55, 0.3);
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: flex;
             align-items: center;
@@ -131,12 +124,11 @@
             gap: 15px;
             text-transform: uppercase;
             min-width: 320px;
-            /* 문구가 길어질 수 있어 폭을 조금 넓힘 */
         }
 
         .main-btn:active {
             transform: scale(0.94) translateY(4px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.4);
         }
 
         .main-btn:disabled {
@@ -147,7 +139,7 @@
 
         .sound-hint {
             font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.4);
+            color: rgba(255,255,255,0.4);
             margin-top: 15px;
             letter-spacing: 1px;
         }
@@ -168,16 +160,13 @@
             opacity: 0;
             transform: scale(0.95) translateY(25px);
             animation: cardAppear 0.6s forwards cubic-bezier(0.23, 1, 0.32, 1);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             position: relative;
             overflow: hidden;
         }
 
         @keyframes cardAppear {
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
 
         .match-header {
@@ -244,7 +233,7 @@
         footer {
             padding: 50px;
             text-align: center;
-            color: rgba(255, 255, 255, 0.3);
+            color: rgba(255,255,255,0.3);
             font-size: 0.8rem;
             line-height: 1.8;
             z-index: 1;
@@ -255,17 +244,11 @@
         }
 
         @keyframes neonGlow {
-            from {
-                text-shadow: 0 0 10px var(--gold), 0 0 20px rgba(212, 175, 55, 0.2);
-            }
-
-            to {
-                text-shadow: 0 0 20px var(--gold), 0 0 40px var(--gold-light);
-            }
+            from { text-shadow: 0 0 10px var(--gold), 0 0 20px rgba(212, 175, 55, 0.2); }
+            to { text-shadow: 0 0 20px var(--gold), 0 0 40px var(--gold-light); }
         }
     </style>
 </head>
-
 <body>
 
     <header>
@@ -295,8 +278,8 @@
 
     <script>
         const members = [
-            "백사6000", "려리", "kbh", "발칸VULCAN",
-            "지교", "무등산1329", "입석대", "케이574",
+            "백사6000", "려리", "kbh", "발칸VULCAN", 
+            "지교", "무등산1329", "입석대", "케이574", 
             "그렌다이저", "SMG", "도유나가즈아", "메롱상태"
         ];
 
@@ -313,7 +296,6 @@
             "큐 잡는 손이 바들바들... 긴장하면 지는 겁니다!"
         ];
 
-        // 다시 돌리기용 위트 있는 문구들
         const retryPhrases = [
             "인정 못해! 판 다시 짜기",
             "큐대 다시 잡고 리매치",
@@ -359,21 +341,21 @@
             if (audioCtx.state === 'suspended') audioCtx.resume();
 
             const now = audioCtx.currentTime;
-            const notes = [523.25, 659.25, 783.99, 1046.50];
-
+            const notes = [523.25, 659.25, 783.99, 1046.50]; 
+            
             notes.forEach((freq, i) => {
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
-
+                
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(freq, now + (i * 0.1));
-
+                
                 gain.gain.setValueAtTime(0.2, now + (i * 0.1));
                 gain.gain.exponentialRampToValueAtTime(0.001, now + (i * 0.1) + 0.6);
-
+                
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
-
+                
                 osc.start(now + (i * 0.1));
                 osc.stop(now + (i * 0.1) + 0.6);
             });
@@ -391,10 +373,10 @@
                 this.y = y;
                 this.vx = vx;
                 this.vy = vy;
-                this.radius = 10;
+                this.radius = 10; 
                 this.color = color;
                 this.label = label;
-                this.friction = 0.996;
+                this.friction = 0.996; 
             }
 
             draw() {
@@ -404,7 +386,7 @@
                 ctx.fill();
 
                 const grad = ctx.createRadialGradient(
-                    this.x - this.radius / 2.5, this.y - this.radius / 2.5, this.radius / 10,
+                    this.x - this.radius/2.5, this.y - this.radius/2.5, this.radius/10,
                     this.x, this.y, this.radius
                 );
                 grad.addColorStop(0, '#fff');
@@ -417,7 +399,7 @@
                 ctx.fill();
 
                 ctx.beginPath();
-                ctx.arc(this.x - this.radius / 3, this.y - this.radius / 3, 2, 0, Math.PI * 2);
+                ctx.arc(this.x - this.radius/3, this.y - this.radius/3, 2, 0, Math.PI * 2);
                 ctx.fillStyle = 'rgba(255,255,255,0.6)';
                 ctx.fill();
             }
@@ -497,10 +479,10 @@
 
         function render() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+            
             ctx.strokeStyle = 'rgba(255,255,255,0.03)';
             ctx.lineWidth = 1;
-            for (let i = 0; i < canvas.width; i += 40) {
+            for(let i=0; i<canvas.width; i+=40) {
                 ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
             }
 
@@ -524,18 +506,18 @@
             initAudio();
             const btn = document.getElementById('actionBtn');
             const resultsDiv = document.getElementById('results');
-
+            
             btn.disabled = true;
             let textIdx = 0;
             btn.innerHTML = `<span>⏳</span> ${loadingTexts[textIdx]}`;
-
+            
             const textInterval = setInterval(() => {
                 textIdx = (textIdx + 1) % loadingTexts.length;
                 btn.innerHTML = `<span>⏳</span> ${loadingTexts[textIdx]}`;
             }, 1400);
 
             resultsDiv.innerHTML = '';
-
+            
             isSimulating = true;
             balls.forEach(ball => {
                 ball.vx = (Math.random() - 0.5) * 16;
@@ -545,11 +527,10 @@
             setTimeout(() => {
                 clearInterval(textInterval);
                 isSimulating = false;
-
+                
                 playSuccessSound();
                 showResults();
-
-                // 버튼 문구를 무작위로 변경
+                
                 const randomPhrase = retryPhrases[Math.floor(Math.random() * retryPhrases.length)];
                 btn.disabled = false;
                 btn.innerHTML = `<span>🔄</span> ${randomPhrase}`;
@@ -559,19 +540,20 @@
         function showResults() {
             const shuffled = [...members].sort(() => Math.random() - 0.5);
             const resultsDiv = document.getElementById('results');
-
+            
             for (let i = 0; i < shuffled.length; i += 2) {
                 const p1 = shuffled[i];
-                const p2 = shuffled[i + 1];
+                const p2 = shuffled[i+1];
                 const comment = comments[Math.floor(Math.random() * comments.length)];
-
+                
                 const card = document.createElement('div');
                 card.className = 'match-card';
-                card.style.animationDelay = `${(i / 2) * 0.35}s`;
-
+                card.style.animationDelay = `${(i/2) * 0.35}s`;
+                
                 card.innerHTML = `
                     <div class="match-header">
-                        <span>BRIDGE MATCH ${i / 2 + 1}</span>
+                        <!-- BRIDGE MATCH에서 THE BRIDGE MATCH로 수정됨 -->
+                        <span>THE BRIDGE MATCH ${i/2 + 1}</span>
                         <span>OFFICIAL 2025</span>
                     </div>
                     <div class="match-body">
@@ -597,5 +579,4 @@
         window.onresize = initCanvas;
     </script>
 </body>
-
 </html>
