@@ -98,6 +98,83 @@
             box-shadow: inset 0 0 50px rgba(0,0,0,0.4);
         }
 
+        .roster {
+            width: 90%;
+            max-width: 500px;
+            margin-bottom: 30px;
+            z-index: 2;
+        }
+
+        .roster-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            padding: 0 4px;
+        }
+
+        .roster-title {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--gold);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .roster-count {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--gold-light);
+        }
+
+        .roster-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .member-chip {
+            background: linear-gradient(135deg, rgba(46, 204, 113, 0.18) 0%, rgba(46, 204, 113, 0.08) 100%);
+            border: 1px solid rgba(46, 204, 113, 0.45);
+            color: var(--white);
+            border-radius: 14px;
+            padding: 12px 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            -webkit-user-select: none;
+            position: relative;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .member-chip::before {
+            content: "✓";
+            margin-right: 5px;
+            color: var(--neon-green);
+            font-weight: 900;
+        }
+
+        .member-chip.absent {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.12);
+            color: rgba(255, 255, 255, 0.35);
+            text-decoration: line-through;
+        }
+
+        .member-chip.absent::before {
+            content: "✕";
+            color: var(--red);
+        }
+
+        .member-chip:active {
+            transform: scale(0.93);
+        }
+
         .controls {
             width: 100%;
             display: flex;
@@ -262,11 +339,19 @@
         <div class="table-overlay"></div>
     </div>
 
+    <div class="roster">
+        <div class="roster-header">
+            <span class="roster-title">참석 회원 선택</span>
+            <span class="roster-count" id="rosterCount">참석 0명</span>
+        </div>
+        <div class="roster-grid" id="rosterGrid"></div>
+    </div>
+
     <div class="controls">
         <button class="main-btn" id="actionBtn" onclick="handleStart()">
             <span>🎱</span> 운명의 큐대 돌리기
         </button>
-        <div class="sound-hint">※ 사운드가 켜져 있는지 확인해 주세요</div>
+        <div class="sound-hint">※ 불참 회원은 이름을 눌러 제외하세요</div>
     </div>
 
     <div id="results"></div>
@@ -278,10 +363,40 @@
 
     <script>
         const members = [
-            "백사6000", "려리", "kbh", "발칸VULCAN", 
-            "지교", "무등산1329", "입석대", "케이574", 
+            "백사6000", "려리", "kbh", "발칸VULCAN",
+            "지교", "무등산1329", "입석대", "케이574",
             "그렌다이저", "SMG", "도유나가즈아", "메롱상태"
         ];
+
+        // 당일 참석 여부 (true: 참석, false: 불참) - 기본값 전원 참석
+        const attendance = members.map(() => true);
+
+        function renderRoster() {
+            const grid = document.getElementById('rosterGrid');
+            grid.innerHTML = '';
+            members.forEach((name, idx) => {
+                const chip = document.createElement('div');
+                chip.className = 'member-chip' + (attendance[idx] ? '' : ' absent');
+                chip.textContent = name;
+                chip.title = name;
+                chip.onclick = () => {
+                    attendance[idx] = !attendance[idx];
+                    chip.classList.toggle('absent', !attendance[idx]);
+                    updateRosterCount();
+                };
+                grid.appendChild(chip);
+            });
+            updateRosterCount();
+        }
+
+        function updateRosterCount() {
+            const count = attendance.filter(Boolean).length;
+            document.getElementById('rosterCount').textContent = `참석 ${count}명`;
+        }
+
+        function getAttendingMembers() {
+            return members.filter((_, idx) => attendance[idx]);
+        }
 
         const comments = [
             "이 매칭... 사실상 결승전 아닌가요? 관전 필수!",
@@ -506,7 +621,13 @@
             initAudio();
             const btn = document.getElementById('actionBtn');
             const resultsDiv = document.getElementById('results');
-            
+
+            const attendingCount = getAttendingMembers().length;
+            if (attendingCount < 2) {
+                alert('매칭을 하려면 최소 2명 이상 참석해야 합니다.\n현재 참석 인원: ' + attendingCount + '명');
+                return;
+            }
+
             btn.disabled = true;
             let textIdx = 0;
             btn.innerHTML = `<span>⏳</span> ${loadingTexts[textIdx]}`;
@@ -538,18 +659,23 @@
         }
 
         function showResults() {
-            const shuffled = [...members].sort(() => Math.random() - 0.5);
+            // 당일 참석한 회원만 매칭 대상으로 셔플
+            const shuffled = getAttendingMembers().sort(() => Math.random() - 0.5);
             const resultsDiv = document.getElementById('results');
-            
+
+            // 참석 인원이 홀수면 마지막 1명은 부전승(대기)으로 분리
+            const hasBye = shuffled.length % 2 === 1;
+            const byePlayer = hasBye ? shuffled.pop() : null;
+
             for (let i = 0; i < shuffled.length; i += 2) {
                 const p1 = shuffled[i];
                 const p2 = shuffled[i+1];
                 const comment = comments[Math.floor(Math.random() * comments.length)];
-                
+
                 const card = document.createElement('div');
                 card.className = 'match-card';
                 card.style.animationDelay = `${(i/2) * 0.35}s`;
-                
+
                 card.innerHTML = `
                     <div class="match-header">
                         <!-- BRIDGE MATCH에서 THE BRIDGE MATCH로 수정됨 -->
@@ -570,12 +696,35 @@
                 resultsDiv.appendChild(card);
             }
 
+            // 부전승 카드 (참석자가 홀수일 때)
+            if (byePlayer) {
+                const byeCard = document.createElement('div');
+                byeCard.className = 'match-card';
+                byeCard.style.animationDelay = `${(shuffled.length/2) * 0.35}s`;
+                byeCard.innerHTML = `
+                    <div class="match-header">
+                        <span>THE BRIDGE 부전승</span>
+                        <span>BYE</span>
+                    </div>
+                    <div class="match-body">
+                        <div class="player-box" style="width: 100%;">
+                            <div class="player-name glow">${byePlayer}</div>
+                        </div>
+                    </div>
+                    <div class="comment-box">참석 인원이 홀수라 이번 판은 자동 대기입니다. 다음 판을 노려보세요!</div>
+                `;
+                resultsDiv.appendChild(byeCard);
+            }
+
             setTimeout(() => {
                 window.scrollTo({ top: resultsDiv.offsetTop - 40, behavior: 'smooth' });
             }, 400);
         }
 
-        window.onload = initCanvas;
+        window.onload = () => {
+            initCanvas();
+            renderRoster();
+        };
         window.onresize = initCanvas;
     </script>
 </body>
