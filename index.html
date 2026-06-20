@@ -485,11 +485,15 @@
         let simulationDuration = 0;
 
         // 시뮬레이션 진행도(0~1)에 따라 마찰력을 반환한다.
-        // 후반부로 갈수록 마찰을 강하게 주어 공이 천천히 멈추도록 한다.
+        // 진행도가 높아질수록 마찰을 단계적으로 강하게 주어
+        // 공이 자연스럽게 천천히 감속하다 멈추도록 한다.
         function getFrictionForProgress(progress) {
-            if (progress < 0.5) return 0.998;   // 초반: 활발하게 움직임
-            if (progress < 0.8) return 0.99;    // 중반: 서서히 감속 시작
-            return 0.93;                        // 후반: 천천히 멈춤
+            if (progress < 0.3) return 0.999;   // 초반: 거의 등속으로 굴러감
+            if (progress < 0.5) return 0.997;   // 초중반: 아주 완만하게 감속
+            if (progress < 0.7) return 0.992;   // 중반: 서서히 감속 시작
+            if (progress < 0.85) return 0.98;   // 중후반: 눈에 띄게 느려짐
+            if (progress < 0.95) return 0.95;   // 후반: 확연히 감속
+            return 0.90;                        // 막바지: 천천히 멈춤
         }
 
         class Ball {
@@ -657,8 +661,9 @@
             simulationStart = performance.now();
             isSimulating = true;
             balls.forEach(ball => {
-                ball.vx = (Math.random() - 0.5) * 16;
-                ball.vy = (Math.random() - 0.5) * 16;
+                // 초기 속도를 기존의 절반 수준으로 낮춰 너무 빠르지 않게 한다.
+                ball.vx = (Math.random() - 0.5) * 8;
+                ball.vy = (Math.random() - 0.5) * 8;
             });
 
             setTimeout(() => {
