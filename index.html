@@ -652,8 +652,8 @@
 
             resultsDiv.innerHTML = '';
 
-            // 5초~7초 사이의 랜덤 시간 동안 공이 움직이다가 천천히 멈춘다.
-            simulationDuration = 5000 + Math.random() * 2000;
+            // 10초~15초 사이의 랜덤 시간 동안 공이 움직이다가 천천히 멈춘다.
+            simulationDuration = 10000 + Math.random() * 5000;
             simulationStart = performance.now();
             isSimulating = true;
             balls.forEach(ball => {
