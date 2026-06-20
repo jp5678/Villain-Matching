@@ -481,6 +481,16 @@
         let balls = [];
         let animationId;
         let isSimulating = false;
+        let simulationStart = 0;
+        let simulationDuration = 0;
+
+        // 시뮬레이션 진행도(0~1)에 따라 마찰력을 반환한다.
+        // 후반부로 갈수록 마찰을 강하게 주어 공이 천천히 멈추도록 한다.
+        function getFrictionForProgress(progress) {
+            if (progress < 0.5) return 0.998;   // 초반: 활발하게 움직임
+            if (progress < 0.8) return 0.99;    // 중반: 서서히 감속 시작
+            return 0.93;                        // 후반: 천천히 멈춤
+        }
 
         class Ball {
             constructor(x, y, vx, vy, color, label) {
@@ -491,7 +501,6 @@
                 this.radius = 10; 
                 this.color = color;
                 this.label = label;
-                this.friction = 0.996; 
             }
 
             draw() {
@@ -541,8 +550,12 @@
                     playCollisionSound(Math.abs(this.vx) + Math.abs(this.vy));
                 }
 
-                this.vx *= this.friction;
-                this.vy *= this.friction;
+                const progress = simulationDuration > 0
+                    ? Math.min((performance.now() - simulationStart) / simulationDuration, 1)
+                    : 0;
+                const friction = getFrictionForProgress(progress);
+                this.vx *= friction;
+                this.vy *= friction;
 
                 balls.forEach(other => {
                     if (other === this) return;
@@ -638,7 +651,10 @@
             }, 1400);
 
             resultsDiv.innerHTML = '';
-            
+
+            // 5초~7초 사이의 랜덤 시간 동안 공이 움직이다가 천천히 멈춘다.
+            simulationDuration = 5000 + Math.random() * 2000;
+            simulationStart = performance.now();
             isSimulating = true;
             balls.forEach(ball => {
                 ball.vx = (Math.random() - 0.5) * 16;
@@ -648,14 +664,19 @@
             setTimeout(() => {
                 clearInterval(textInterval);
                 isSimulating = false;
-                
+                // 남아있는 미세한 속도를 0으로 정리한다.
+                balls.forEach(ball => {
+                    ball.vx = 0;
+                    ball.vy = 0;
+                });
+
                 playSuccessSound();
                 showResults();
-                
+
                 const randomPhrase = retryPhrases[Math.floor(Math.random() * retryPhrases.length)];
                 btn.disabled = false;
                 btn.innerHTML = `<span>🔄</span> ${randomPhrase}`;
-            }, 8500);
+            }, simulationDuration);
         }
 
         function showResults() {
