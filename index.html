@@ -256,6 +256,31 @@
                 radial-gradient(circle, rgba(255,255,255,0.92) 0 1.3px, transparent 1.9px) 0 100% / 12.5% 7px repeat-x;
         }
 
+        /* 대진표 텍스트 복사 버튼 */
+        .copy-btn {
+            justify-self: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 6px;
+            padding: 14px 32px;
+            font-size: 1rem;
+            font-weight: 800;
+            font-family: inherit;
+            color: var(--gold-light);
+            background: rgba(212, 175, 55, 0.1);
+            border: 1.5px solid var(--gold);
+            border-radius: 60px;
+            cursor: pointer;
+            opacity: 0;
+            animation: cardAppear 0.6s forwards cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .copy-btn:active {
+            transform: scale(0.96);
+        }
+
         @keyframes cardAppear {
             to { opacity: 1; transform: scale(1) translateY(0); }
         }
@@ -726,6 +751,8 @@
             // 당일 참석한 회원만 매칭 대상으로 셔플
             const shuffled = getAttendingMembers().sort(() => Math.random() - 0.5);
             const resultsDiv = document.getElementById('results');
+            const attendCount = shuffled.length;
+            const textLines = [];
 
             // 참석 인원이 홀수면 마지막 1명은 부전승(대기)으로 분리
             const hasBye = shuffled.length % 2 === 1;
@@ -738,6 +765,7 @@
                 const p1 = shuffled[i];
                 const p2 = shuffled[i+1];
                 const comment = commentPool[(i/2) % commentPool.length];
+                textLines.push(`MATCH ${i/2 + 1}: ${p1} vs ${p2}`);
 
                 const card = document.createElement('div');
                 card.className = 'match-card';
@@ -778,11 +806,59 @@
                     <div class="comment-box">싸우지 않고 이기는 것이 최고의 승리! 운도 실력, 이번 판은 부전승으로 1승 챙기셨습니다.</div>
                 `;
                 resultsDiv.appendChild(byeCard);
+                textLines.push(`부전승: ${byePlayer}`);
             }
+
+            // 대진표 텍스트 복사 버튼 (마지막 카드 다음에 등장)
+            const d = new Date();
+            const today = `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 (${'일월화수목금토'[d.getDay()]})`;
+            const resultText = [
+                '🎱 THE BRIDGE 오늘의 대진표',
+                `${today} · 참석 ${attendCount}명`,
+                '',
+                ...textLines
+            ].join('\n');
+            const cardCount = Math.ceil(attendCount / 2);
+            const copyBtn = document.createElement('button');
+            copyBtn.type = 'button';
+            copyBtn.className = 'copy-btn';
+            copyBtn.style.animationDelay = `${cardCount * 0.35}s`;
+            copyBtn.innerHTML = COPY_LABEL;
+            copyBtn.onclick = () => copyResultText(resultText, copyBtn);
+            resultsDiv.appendChild(copyBtn);
 
             setTimeout(() => {
                 window.scrollTo({ top: resultsDiv.offsetTop - 40, behavior: 'smooth' });
             }, 400);
+        }
+
+        const COPY_LABEL = '<span>📋</span> 대진표 텍스트 복사';
+
+        async function copyResultText(text, btn) {
+            let copied = false;
+            try {
+                await navigator.clipboard.writeText(text);
+                copied = true;
+            } catch (e) {
+                // 클립보드 API가 없는 환경(일부 앱 내장 브라우저)용 예비 방식
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.setAttribute('readonly', '');
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.select();
+                ta.setSelectionRange(0, text.length);
+                try { copied = document.execCommand('copy'); } catch (err) { copied = false; }
+                document.body.removeChild(ta);
+            }
+            if (!copied) {
+                alert('복사에 실패했습니다. 아래 내용을 직접 복사해 주세요.\n\n' + text);
+                return;
+            }
+            btn.innerHTML = '<span>✅</span> 복사 완료! 단체방에 붙여넣으세요';
+            clearTimeout(btn._resetTimer);
+            btn._resetTimer = setTimeout(() => { btn.innerHTML = COPY_LABEL; }, 2000);
         }
 
         window.onload = () => {
