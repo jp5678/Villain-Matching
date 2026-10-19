@@ -846,7 +846,7 @@
                 alert('복사에 실패했습니다. 아래 내용을 직접 복사해 주세요.\n\n' + text);
                 return;
             }
-            btn.innerHTML = '<span>✅</span> 복사 완료!';
+            btn.innerHTML = '<span>✅</span> 카톡에 붙여넣기!';
             clearTimeout(btn._resetTimer);
             btn._resetTimer = setTimeout(() => { btn.innerHTML = COPY_LABEL; }, 2000);
         }
