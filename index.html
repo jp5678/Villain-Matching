@@ -430,7 +430,7 @@
             animation: neonGlow 2s infinite alternate;
         }
 
-        /* 부전승 회원 이름 깜박임 */
+        /* 부전승 헤더 글씨 깜박임 */
         .blink {
             animation: nameBlink 1s steps(1, end) infinite;
         }
@@ -879,11 +879,11 @@
                 byeCard.style.animationDelay = `${(shuffled.length/2) * 0.35}s`;
                 byeCard.innerHTML = `
                     <div class="match-header">
-                        <span>부전승</span>
+                        <span class="blink">부전승</span>
                     </div>
                     <div class="match-body">
                         <div class="player-box" style="width: 100%;">
-                            <div class="player-name blink">${byePlayer}</div>
+                            <div class="player-name">${byePlayer}</div>
                         </div>
                     </div>
                     <div class="comment-box">${BYE_COMMENT}</div>
