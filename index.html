@@ -229,17 +229,49 @@
             gap: 18px;
         }
 
+        /* 경기 카드 = 당구대(진회색 레일·은색 띠 + 파란 천). 천은 조명처럼 가운데가 밝고 바깥이 어두움 */
         .match-card {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
-            border: 1px solid rgba(212, 175, 55, 0.15);
-            border-radius: 20px;
-            padding: 24px;
+            background:
+                linear-gradient(180deg, rgba(8, 32, 72, 0.42) 0, rgba(8, 32, 72, 0) 52px),
+                radial-gradient(ellipse 70% 72% at 50% 60%, #3592e4 0%, #2a7fd4 45%, #2068bb 80%, #1b5ca9 100%);
+            border: 7px solid #3f4247;
+            border-radius: 16px;
+            padding: 20px;
             opacity: 0;
             transform: scale(0.95) translateY(25px);
             animation: cardAppear 0.6s forwards cubic-bezier(0.23, 1, 0.32, 1);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            box-shadow: inset 0 0 0 2px #9aa3ae, inset 0 6px 14px rgba(0, 30, 70, 0.25), 0 10px 25px rgba(0,0,0,0.3);
             position: relative;
-            overflow: hidden;
+        }
+
+        /* 위·아래 레일의 포인트(다이아몬드) */
+        .match-card::before {
+            content: "";
+            position: absolute;
+            inset: -7px;
+            border-radius: 16px;
+            pointer-events: none;
+            background:
+                radial-gradient(circle, rgba(255,255,255,0.92) 0 1.3px, transparent 1.9px) 0 0 / 12.5% 7px repeat-x,
+                radial-gradient(circle, rgba(255,255,255,0.92) 0 1.3px, transparent 1.9px) 0 100% / 12.5% 7px repeat-x;
+        }
+
+        /* 부전승 카드 = 초록 천 + 금색 띠·포인트로 일반 경기(파란 천)와 구분 */
+        .match-card.bye {
+            background:
+                linear-gradient(180deg, rgba(0, 30, 20, 0.42) 0, rgba(0, 30, 20, 0) 52px),
+                radial-gradient(ellipse 70% 72% at 50% 60%, #1d8a68 0%, #157556 45%, #0f5e45 80%, #0a4d38 100%);
+            box-shadow: inset 0 0 0 2px var(--gold), inset 0 6px 14px rgba(0, 30, 20, 0.3), 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .match-card.bye::before {
+            background:
+                radial-gradient(circle, rgba(230, 195, 92, 0.95) 0 1.3px, transparent 1.9px) 0 0 / 12.5% 7px repeat-x,
+                radial-gradient(circle, rgba(230, 195, 92, 0.95) 0 1.3px, transparent 1.9px) 0 100% / 12.5% 7px repeat-x;
+        }
+
+        .match-card.bye .match-header {
+            color: var(--gold-light);
         }
 
         @keyframes cardAppear {
@@ -253,9 +285,10 @@
             margin-bottom: 18px;
             font-size: 0.75rem;
             font-weight: 800;
-            color: var(--gold);
+            color: #d5dbe0;
+            text-shadow: 0 1px 2px rgba(0, 20, 50, 0.35);
             text-transform: uppercase;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.18);
             padding-bottom: 10px;
         }
 
@@ -269,14 +302,18 @@
         .player-box {
             text-align: center;
             width: 42%;
+            background: #141b22;
+            border: 1.5px solid rgba(5, 7, 10, 0.35);
+            border-radius: 12px;
+            padding: 12px 6px;
         }
 
         .player-name {
             font-size: 1.35rem;
             font-weight: 800;
             color: var(--white);
-            margin-bottom: 5px;
             letter-spacing: -0.5px;
+            overflow-wrap: anywhere;
         }
 
         .vs-badge {
@@ -295,8 +332,8 @@
         }
 
         .comment-box {
-            background: rgba(46, 204, 113, 0.1);
-            border: 1px dashed rgba(46, 204, 113, 0.2);
+            background: rgba(5, 15, 30, 0.55);
+            border: 1px dashed rgba(175, 255, 96, 0.35);
             border-radius: 12px;
             padding: 12px;
             margin-top: 20px;
@@ -704,8 +741,7 @@
 
                 card.innerHTML = `
                     <div class="match-header">
-                        <!-- BRIDGE MATCH에서 THE BRIDGE MATCH로 수정됨 -->
-                        <span>THE BRIDGE MATCH ${i/2 + 1}</span>
+                        <span>MATCH ${i/2 + 1}</span>
                         <span>OFFICIAL</span>
                     </div>
                     <div class="match-body">
@@ -725,11 +761,11 @@
             // 부전승 카드 (참석자가 홀수일 때)
             if (byePlayer) {
                 const byeCard = document.createElement('div');
-                byeCard.className = 'match-card';
+                byeCard.className = 'match-card bye';
                 byeCard.style.animationDelay = `${(shuffled.length/2) * 0.35}s`;
                 byeCard.innerHTML = `
                     <div class="match-header">
-                        <span>THE BRIDGE 부전승</span>
+                        <span>부전승</span>
                         <span>BYE</span>
                     </div>
                     <div class="match-body">
@@ -737,7 +773,7 @@
                             <div class="player-name glow">${byePlayer}</div>
                         </div>
                     </div>
-                    <div class="comment-box">참석 인원이 홀수라 이번 판은 자동 대기입니다. 다음 판을 노려보세요!</div>
+                    <div class="comment-box">싸우지 않고 이기는 것이 최고의 승리! 운도 실력, 이번 판은 부전승으로 1승 챙기셨습니다.</div>
                 `;
                 resultsDiv.appendChild(byeCard);
             }
