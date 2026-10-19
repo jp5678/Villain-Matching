@@ -256,6 +256,24 @@
                 radial-gradient(circle, rgba(255,255,255,0.92) 0 1.3px, transparent 1.9px) 0 100% / 12.5% 7px repeat-x;
         }
 
+        /* 부전승 카드 = 초록 천 + 금색 띠·포인트로 일반 경기(파란 천)와 구분 */
+        .match-card.bye {
+            background:
+                linear-gradient(180deg, rgba(0, 30, 20, 0.42) 0, rgba(0, 30, 20, 0) 52px),
+                radial-gradient(ellipse 70% 72% at 50% 60%, #1d8a68 0%, #157556 45%, #0f5e45 80%, #0a4d38 100%);
+            box-shadow: inset 0 0 0 2px var(--gold), inset 0 6px 14px rgba(0, 30, 20, 0.3), 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .match-card.bye::before {
+            background:
+                radial-gradient(circle, rgba(230, 195, 92, 0.95) 0 1.3px, transparent 1.9px) 0 0 / 12.5% 7px repeat-x,
+                radial-gradient(circle, rgba(230, 195, 92, 0.95) 0 1.3px, transparent 1.9px) 0 100% / 12.5% 7px repeat-x;
+        }
+
+        .match-card.bye .match-header {
+            color: var(--gold-light);
+        }
+
         @keyframes cardAppear {
             to { opacity: 1; transform: scale(1) translateY(0); }
         }
@@ -743,11 +761,11 @@
             // 부전승 카드 (참석자가 홀수일 때)
             if (byePlayer) {
                 const byeCard = document.createElement('div');
-                byeCard.className = 'match-card';
+                byeCard.className = 'match-card bye';
                 byeCard.style.animationDelay = `${(shuffled.length/2) * 0.35}s`;
                 byeCard.innerHTML = `
                     <div class="match-header">
-                        <span>THE BRIDGE 부전승</span>
+                        <span>부전승</span>
                         <span>BYE</span>
                     </div>
                     <div class="match-body">
