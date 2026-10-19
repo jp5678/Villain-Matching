@@ -264,14 +264,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 18px;
-            font-size: 0.75rem;
-            font-weight: 800;
-            color: #d5dbe0;
-            text-shadow: 0 1px 2px rgba(0, 20, 50, 0.35);
+            margin-bottom: 14px;
+            font-size: 1.2rem;
+            font-weight: 900;
+            letter-spacing: 0.05em;
+            color: var(--gold-light);
+            text-shadow: 0 1px 3px rgba(0, 20, 50, 0.6);
             text-transform: uppercase;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.18);
-            padding-bottom: 10px;
         }
 
         /* 헤더 글씨가 하나뿐이면(MATCH n) 가운데 정렬 */
@@ -722,10 +721,13 @@
             const hasBye = shuffled.length % 2 === 1;
             const byePlayer = hasBye ? shuffled.pop() : null;
 
+            // 한 번의 대진에서 코멘트가 겹치지 않도록 섞어서 차례로 사용
+            const commentPool = [...comments].sort(() => Math.random() - 0.5);
+
             for (let i = 0; i < shuffled.length; i += 2) {
                 const p1 = shuffled[i];
                 const p2 = shuffled[i+1];
-                const comment = comments[Math.floor(Math.random() * comments.length)];
+                const comment = commentPool[(i/2) % commentPool.length];
 
                 const card = document.createElement('div');
                 card.className = 'match-card';
@@ -757,7 +759,6 @@
                 byeCard.innerHTML = `
                     <div class="match-header">
                         <span>부전승</span>
-                        <span>WIN</span>
                     </div>
                     <div class="match-body">
                         <div class="player-box" style="width: 100%;">
