@@ -256,29 +256,14 @@
                 radial-gradient(circle, rgba(255,255,255,0.92) 0 1.3px, transparent 1.9px) 0 100% / 12.5% 7px repeat-x;
         }
 
-        /* 대진표 텍스트 복사 버튼 */
+        /* 대진표 텍스트 복사 버튼: 모양은 .main-btn(운명의 큐대 돌리기)을 그대로 사용 */
         .copy-btn {
             justify-self: center;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
             margin-top: 6px;
-            padding: 14px 32px;
-            font-size: 1rem;
-            font-weight: 800;
             font-family: inherit;
-            color: var(--gold-light);
-            background: rgba(212, 175, 55, 0.1);
-            border: 1.5px solid var(--gold);
-            border-radius: 60px;
-            cursor: pointer;
+            white-space: nowrap;
             opacity: 0;
             animation: cardAppear 0.6s forwards cubic-bezier(0.23, 1, 0.32, 1);
-        }
-
-        .copy-btn:active {
-            transform: scale(0.96);
         }
 
         @keyframes cardAppear {
@@ -821,10 +806,15 @@
             const cardCount = Math.ceil(attendCount / 2);
             const copyBtn = document.createElement('button');
             copyBtn.type = 'button';
-            copyBtn.className = 'copy-btn';
+            copyBtn.className = 'main-btn copy-btn';
             copyBtn.style.animationDelay = `${cardCount * 0.35}s`;
             copyBtn.innerHTML = COPY_LABEL;
             copyBtn.onclick = () => copyResultText(resultText, copyBtn);
+            // 등장 애니메이션이 끝나면 해제해야 누를 때 눌리는 효과(:active)가 보인다
+            copyBtn.addEventListener('animationend', () => {
+                copyBtn.style.animation = 'none';
+                copyBtn.style.opacity = '1';
+            }, { once: true });
             resultsDiv.appendChild(copyBtn);
 
             setTimeout(() => {
@@ -832,7 +822,7 @@
             }, 400);
         }
 
-        const COPY_LABEL = '<span>📋</span> 대진표 텍스트 복사';
+        const COPY_LABEL = '<span>📋</span> 대진표 복사';
 
         async function copyResultText(text, btn) {
             let copied = false;
@@ -856,7 +846,7 @@
                 alert('복사에 실패했습니다. 아래 내용을 직접 복사해 주세요.\n\n' + text);
                 return;
             }
-            btn.innerHTML = '<span>✅</span> 복사 완료! 단체방에 붙여넣으세요';
+            btn.innerHTML = '<span>✅</span> 복사 완료!';
             clearTimeout(btn._resetTimer);
             btn._resetTimer = setTimeout(() => { btn.innerHTML = COPY_LABEL; }, 2000);
         }
