@@ -256,101 +256,6 @@
                 radial-gradient(circle, rgba(255,255,255,0.92) 0 1.3px, transparent 1.9px) 0 100% / 12.5% 7px repeat-x;
         }
 
-        [hidden] {
-            display: none !important;
-        }
-
-        /* 대진표 이미지 공유 버튼 */
-        .share-btn {
-            justify-self: center;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 6px;
-            padding: 14px 32px;
-            font-size: 1rem;
-            font-weight: 800;
-            font-family: inherit;
-            color: var(--gold-light);
-            background: rgba(212, 175, 55, 0.1);
-            border: 1.5px solid var(--gold);
-            border-radius: 60px;
-            cursor: pointer;
-            text-decoration: none;
-            opacity: 0;
-            animation: cardAppear 0.6s forwards cubic-bezier(0.23, 1, 0.32, 1);
-        }
-
-        .share-btn:active {
-            transform: scale(0.96);
-        }
-
-        .share-btn:disabled {
-            opacity: 0.5;
-            cursor: wait;
-        }
-
-        /* 공유 기능이 없는 환경용 이미지 미리보기 */
-        .share-preview {
-            position: fixed;
-            inset: 0;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-            background: rgba(0, 0, 0, 0.85);
-        }
-
-        .share-preview-inner {
-            width: 100%;
-            max-width: 440px;
-            max-height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .share-preview-inner img {
-            width: 100%;
-            min-height: 0;
-            flex: 1 1 auto;
-            object-fit: contain;
-            border-radius: 12px;
-        }
-
-        .share-preview-inner p {
-            margin: 0;
-            font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.75);
-            text-align: center;
-        }
-
-        .share-preview-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .share-preview-actions .share-btn {
-            opacity: 1;
-            animation: none;
-            margin-top: 0;
-        }
-
-        .share-close {
-            padding: 14px 24px;
-            font-size: 1rem;
-            font-weight: 700;
-            font-family: inherit;
-            color: var(--white);
-            background: transparent;
-            border: 1.5px solid rgba(255, 255, 255, 0.4);
-            border-radius: 60px;
-            cursor: pointer;
-        }
-
         @keyframes cardAppear {
             to { opacity: 1; transform: scale(1) translateY(0); }
         }
@@ -479,17 +384,6 @@
 
     <div id="results"></div>
 
-    <div id="sharePreview" class="share-preview" hidden>
-        <div class="share-preview-inner">
-            <img id="sharePreviewImg" alt="오늘의 대진표">
-            <p>휴대폰에서는 이미지를 길게 눌러 저장할 수 있습니다.</p>
-            <div class="share-preview-actions">
-                <a id="shareDownload" class="share-btn">💾 이미지 저장</a>
-                <button type="button" class="share-close" onclick="closeSharePreview()">닫기</button>
-            </div>
-        </div>
-    </div>
-
     <footer>
         &copy; 2025 THE BRIDGE BILLIARDS CLUB<br>
         모든 권한은 더 브릿지 회원님들께 있습니다.
@@ -554,8 +448,6 @@
             "마지막 한 큐까지 방심 금물! 역전의 냄새가 납니다.",
             "점수판 넘기는 손이 바빠질 예정입니다."
         ];
-
-        const BYE_COMMENT = "싸우지 않고 이기는 것이 최고의 승리! 운도 실력, 이번 판은 부전승으로 1승 챙기셨습니다.";
 
         const retryPhrases = [
             "인정 못해! 판 다시 짜기",
@@ -834,8 +726,6 @@
             // 당일 참석한 회원만 매칭 대상으로 셔플
             const shuffled = getAttendingMembers().sort(() => Math.random() - 0.5);
             const resultsDiv = document.getElementById('results');
-            const attendCount = shuffled.length;
-            const matchData = { pairs: [], bye: null, attendCount };
 
             // 참석 인원이 홀수면 마지막 1명은 부전승(대기)으로 분리
             const hasBye = shuffled.length % 2 === 1;
@@ -848,7 +738,6 @@
                 const p1 = shuffled[i];
                 const p2 = shuffled[i+1];
                 const comment = commentPool[(i/2) % commentPool.length];
-                matchData.pairs.push({ p1, p2, comment });
 
                 const card = document.createElement('div');
                 card.className = 'match-card';
@@ -886,306 +775,14 @@
                             <div class="player-name">${byePlayer}</div>
                         </div>
                     </div>
-                    <div class="comment-box">${BYE_COMMENT}</div>
+                    <div class="comment-box">싸우지 않고 이기는 것이 최고의 승리! 운도 실력, 이번 판은 부전승으로 1승 챙기셨습니다.</div>
                 `;
                 resultsDiv.appendChild(byeCard);
-                matchData.bye = { name: byePlayer, comment: BYE_COMMENT };
             }
-
-            // 대진표 이미지 공유 버튼 (마지막 카드 다음에 등장)
-            const cardCount = matchData.pairs.length + (byePlayer ? 1 : 0);
-            const shareBtn = document.createElement('button');
-            shareBtn.type = 'button';
-            shareBtn.id = 'shareBtn';
-            shareBtn.className = 'share-btn';
-            shareBtn.style.animationDelay = `${cardCount * 0.35}s`;
-            shareBtn.innerHTML = '<span>📸</span> 대진표 이미지로 공유';
-            shareBtn.onclick = shareResultImage;
-            resultsDiv.appendChild(shareBtn);
-
-            // 아이폰 사파리는 버튼을 누른 직후에만 공유 창을 열어주므로 이미지를 미리 만들어 둔다
-            prepareShareImage(matchData);
 
             setTimeout(() => {
                 window.scrollTo({ top: resultsDiv.offsetTop - 40, behavior: 'smooth' });
             }, 400);
-        }
-
-        // ===== 대진표 이미지 만들기·공유 =====
-        // 외부 라이브러리 없이 Canvas로 화면의 당구대 카드를 그대로 그린다.
-        const IMG_FONT = "'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif";
-        const IMG_WIDTH = 420;   // 논리 폭(px)
-        const IMG_SCALE = 3;     // 실제 해상도 배율 (1260px)
-        const IMG_MAX_PIXELS = 16000000; // 아이폰 사파리 캔버스 한도(약 1,670만 화소) 이내로 유지
-        let shareImage = null;   // { blob, fileName }
-
-        function roundRectPath(ctx, x, y, w, h, r) {
-            ctx.beginPath();
-            ctx.moveTo(x + r, y);
-            ctx.arcTo(x + w, y, x + w, y + h, r);
-            ctx.arcTo(x + w, y + h, x, y + h, r);
-            ctx.arcTo(x, y + h, x, y, r);
-            ctx.arcTo(x, y, x + w, y, r);
-            ctx.closePath();
-        }
-
-        // 띄어쓰기 기준으로 줄바꿈하고, 한 단어가 너무 길면 글자 단위로 자른다
-        function wrapText(ctx, text, maxWidth) {
-            const lines = [];
-            let line = '';
-            for (const word of text.split(' ')) {
-                const test = line ? line + ' ' + word : word;
-                if (ctx.measureText(test).width <= maxWidth) {
-                    line = test;
-                    continue;
-                }
-                if (line) lines.push(line);
-                line = '';
-                for (const ch of word) {
-                    if (line && ctx.measureText(line + ch).width > maxWidth) {
-                        lines.push(line);
-                        line = ch;
-                    } else {
-                        line += ch;
-                    }
-                }
-            }
-            if (line) lines.push(line);
-            return lines;
-        }
-
-        // 이름이 상자에 들어가도록 글씨 크기를 줄인다
-        function fitNameFont(ctx, text, maxWidth) {
-            let size = 18;
-            while (size > 12) {
-                ctx.font = `800 ${size}px ${IMG_FONT}`;
-                if (ctx.measureText(text).width <= maxWidth) return;
-                size -= 1;
-            }
-            ctx.font = `800 ${size}px ${IMG_FONT}`;
-        }
-
-        const CARD = { rail: 7, pad: 18, header: 24, gap: 12, box: 52, line: 20 };
-
-        function commentLines(ctx, text, width) {
-            ctx.font = `500 14px ${IMG_FONT}`;
-            return wrapText(ctx, text, width - CARD.pad * 2 - CARD.rail * 2 - 8);
-        }
-
-        function cardHeight(lines) {
-            return CARD.rail * 2 + CARD.pad + CARD.header + CARD.gap + CARD.box + CARD.gap
-                + lines.length * CARD.line + CARD.pad - 4;
-        }
-
-        function drawNameBox(ctx, x, y, w, name) {
-            roundRectPath(ctx, x, y, w, CARD.box, 12);
-            ctx.fillStyle = '#141b22';
-            ctx.fill();
-            ctx.lineWidth = 1.5;
-            ctx.strokeStyle = 'rgba(5, 7, 10, 0.35)';
-            ctx.stroke();
-            fitNameFont(ctx, name, w - 10);
-            ctx.fillStyle = '#d4af37';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(name, x + w / 2, y + CARD.box / 2 + 1, w - 10);
-        }
-
-        // 당구대 카드 한 장 (진회색 레일 + 은색 띠 + 파란 천 + 레일 포인트)
-        function drawCard(ctx, x, y, w, title, lines, names) {
-            const h = cardHeight(lines);
-            const r = CARD.rail;
-            const ix = x + r, iy = y + r, iw = w - r * 2, ih = h - r * 2;
-
-            roundRectPath(ctx, x, y, w, h, 16);
-            ctx.fillStyle = '#3f4247';
-            ctx.fill();
-
-            // 파란 천: 조명처럼 가운데가 밝고 바깥이 어두운 타원형 그라데이션
-            ctx.save();
-            roundRectPath(ctx, ix, iy, iw, ih, 10);
-            ctx.clip();
-            const rx = iw * 0.7, ry = ih * 0.72;
-            ctx.save();
-            ctx.translate(ix + iw / 2, iy + ih * 0.6);
-            ctx.scale(1, ry / rx);
-            const felt = ctx.createRadialGradient(0, 0, 0, 0, 0, rx);
-            felt.addColorStop(0, '#3592e4');
-            felt.addColorStop(0.45, '#2a7fd4');
-            felt.addColorStop(0.8, '#2068bb');
-            felt.addColorStop(1, '#1b5ca9');
-            ctx.fillStyle = felt;
-            ctx.fillRect(-rx * 3, -rx * 3, rx * 6, rx * 6);
-            ctx.restore();
-            const shade = ctx.createLinearGradient(0, iy, 0, iy + 52);
-            shade.addColorStop(0, 'rgba(8, 32, 72, 0.42)');
-            shade.addColorStop(1, 'rgba(8, 32, 72, 0)');
-            ctx.fillStyle = shade;
-            ctx.fillRect(ix, iy, iw, 52);
-            ctx.restore();
-
-            // 은색 띠
-            roundRectPath(ctx, ix + 1, iy + 1, iw - 2, ih - 2, 9);
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = '#9aa3ae';
-            ctx.stroke();
-
-            // 위·아래 레일 포인트
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
-            for (let k = 0; k < 8; k++) {
-                const dx = x + (k + 0.5) * w / 8;
-                for (const dy of [y + r / 2, y + h - r / 2]) {
-                    ctx.beginPath();
-                    ctx.arc(dx, dy, 1.6, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            }
-
-            const cx = x + w / 2;
-            const cw = iw - CARD.pad * 2;
-            const left = ix + CARD.pad;
-            let cy = iy + CARD.pad;
-
-            // 헤더 (MATCH n / 부전승)
-            ctx.save();
-            ctx.shadowColor = 'rgba(0, 20, 50, 0.6)';
-            ctx.shadowBlur = 3;
-            ctx.shadowOffsetY = 1;
-            ctx.fillStyle = '#ffffff';
-            ctx.font = `900 19px ${IMG_FONT}`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(title, cx, cy + CARD.header / 2);
-            ctx.restore();
-            cy += CARD.header + CARD.gap;
-
-            // 선수 이름
-            if (names.length === 2) {
-                const bw = cw * 0.44;
-                drawNameBox(ctx, left, cy, bw, names[0]);
-                drawNameBox(ctx, left + cw - bw, cy, bw, names[1]);
-                ctx.fillStyle = '#333';
-                ctx.font = `900 13px ${IMG_FONT}`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('VS', cx, cy + CARD.box / 2);
-            } else {
-                drawNameBox(ctx, left, cy, cw, names[0]);
-            }
-            cy += CARD.box + CARD.gap;
-
-            // 코멘트
-            ctx.save();
-            ctx.shadowColor = 'rgba(0, 20, 50, 0.6)';
-            ctx.shadowBlur = 3;
-            ctx.shadowOffsetY = 1;
-            ctx.fillStyle = '#ffffff';
-            ctx.font = `500 14px ${IMG_FONT}`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            lines.forEach((ln, idx) => ctx.fillText(ln, cx, cy + CARD.line * idx + CARD.line / 2 - 2));
-            ctx.restore();
-
-            return h;
-        }
-
-        function renderResultImage(data) {
-            const W = IMG_WIDTH, M = 16, cardW = W - M * 2, TOP = 112, FOOT = 44, SPACING = 14;
-            const measure = document.createElement('canvas').getContext('2d');
-            const cards = data.pairs.map((m, idx) => ({
-                title: `MATCH ${idx + 1}`, names: [m.p1, m.p2], lines: commentLines(measure, m.comment, cardW)
-            }));
-            if (data.bye) {
-                cards.push({ title: '부전승', names: [data.bye.name], lines: commentLines(measure, data.bye.comment, cardW) });
-            }
-            const H = TOP + cards.reduce((sum, c) => sum + cardHeight(c.lines) + SPACING, 0) + FOOT;
-
-            const scale = Math.min(IMG_SCALE, Math.sqrt(IMG_MAX_PIXELS / (W * H)));
-            const canvas = document.createElement('canvas');
-            canvas.width = Math.floor(W * scale);
-            canvas.height = Math.floor(H * scale);
-            const ctx = canvas.getContext('2d');
-            ctx.scale(scale, scale);
-
-            ctx.fillStyle = '#05070a';
-            ctx.fillRect(0, 0, W, H);
-
-            // 상단 제목
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.save();
-            ctx.shadowColor = 'rgba(212, 175, 55, 0.6)';
-            ctx.shadowBlur = 14;
-            ctx.fillStyle = '#d4af37';
-            ctx.font = `900 30px ${IMG_FONT}`;
-            ctx.fillText('THE BRIDGE', W / 2, 36);
-            ctx.restore();
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-            ctx.font = `600 13px ${IMG_FONT}`;
-            ctx.fillText("Today's Villain Matching", W / 2, 64);
-            const d = new Date();
-            const today = `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 (${'일월화수목금토'[d.getDay()]})`;
-            ctx.fillStyle = '#f1d592';
-            ctx.font = `700 13px ${IMG_FONT}`;
-            ctx.fillText(`${today} · 참석 ${data.attendCount}명`, W / 2, 86);
-
-            let y = TOP;
-            cards.forEach(c => {
-                y += drawCard(ctx, M, y, cardW, c.title, c.lines, c.names) + SPACING;
-            });
-
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
-            ctx.font = `500 11px ${IMG_FONT}`;
-            ctx.textAlign = 'center';
-            ctx.fillText('© THE BRIDGE BILLIARDS CLUB', W / 2, y + 14);
-
-            return canvas;
-        }
-
-        function prepareShareImage(data) {
-            shareImage = null;
-            const d = new Date();
-            const stamp = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
-            const fileName = `더브릿지_대진표_${stamp}.jpg`;
-            renderResultImage(data).toBlob(blob => {
-                if (blob) shareImage = { blob, fileName };
-            }, 'image/jpeg', 0.92);
-        }
-
-        async function shareResultImage() {
-            if (!shareImage) {
-                alert('이미지를 만드는 중입니다. 잠시 후 다시 눌러주세요.');
-                return;
-            }
-            const { blob, fileName } = shareImage;
-            const file = new File([blob], fileName, { type: 'image/jpeg' });
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                try {
-                    await navigator.share({ files: [file], title: '오늘의 대진표' });
-                    return;
-                } catch (e) {
-                    if (e.name === 'AbortError') return; // 사용자가 공유 창을 닫음
-                }
-            }
-            openSharePreview(blob, fileName);
-        }
-
-        // 공유 기능이 없는 환경(PC, 일부 앱 내장 브라우저)에서는 미리보기 + 저장 버튼을 보여준다
-        function openSharePreview(blob, fileName) {
-            const url = URL.createObjectURL(blob);
-            document.getElementById('sharePreviewImg').src = url;
-            const link = document.getElementById('shareDownload');
-            link.href = url;
-            link.download = fileName;
-            document.getElementById('sharePreview').hidden = false;
-        }
-
-        function closeSharePreview() {
-            const preview = document.getElementById('sharePreview');
-            preview.hidden = true;
-            const img = document.getElementById('sharePreviewImg');
-            if (img.src) URL.revokeObjectURL(img.src);
-            img.removeAttribute('src');
         }
 
         window.onload = () => {
